@@ -2,17 +2,16 @@ package com.example.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-// 또는 @EnableWebSecurity (Spring MVC 사용 시)
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebFluxSecurity  // WebFlux를 사용하는 경우
-// @EnableWebSecurity  // Spring MVC를 사용하는 경우
+//@EnableWebFluxSecurity  // WebFlux를 사용하는 경우
+@EnableWebSecurity  // Spring MVC를 사용하는 경우
 public class SecurityConfig {
 
     @Bean
