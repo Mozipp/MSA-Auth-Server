@@ -35,13 +35,13 @@ jobs:
         run: |
           TAG=${{ github.sha }}
           DOCKER_BUILDKIT=1 docker build --platform linux/amd64 \
-            -t 891377255417.dkr.ecr.ap-northeast-2.amazonaws.com/mozip-product:$TAG .
+            -t 891377255417.dkr.ecr.ap-northeast-2.amazonaws.com/mozip-auth:$TAG .
 
       # 5. ECR에 Docker 이미지 푸시
       - name: Push to Amazon ECR
         run: |
           TAG=${{ github.sha }}
-          docker push 891377255417.dkr.ecr.ap-northeast-2.amazonaws.com/mozip-product:$TAG
+          docker push 891377255417.dkr.ecr.ap-northeast-2.amazonaws.com/mozip-auth:$TAG
 
       # 6. SSH 설정
       - name: Setup SSH key for accessing IaC repo
@@ -61,7 +61,7 @@ jobs:
           TAG=${{ github.sha }}
           git clone git@github.com:jaebinGit/hachwimu-iac-jaebin.git
           cd hachwimu-iac-jaebin
-          sed -i "s|image: .*mozip-product:.*$|image: 891377255417.dkr.ecr.ap-northeast-2.amazonaws.com/mozip-product:${TAG}|g" rollout.yaml          
+          sed -i "s|image: .*mozip-auth:.*$|image: 891377255417.dkr.ecr.ap-northeast-2.amazonaws.com/mozip-auth:${TAG}|g" rollout.yaml          
           git add rollout.yaml
           git commit -m "Update product image to ${TAG}" || echo "Nothing to commit"
           git push origin main || echo "Push failed"

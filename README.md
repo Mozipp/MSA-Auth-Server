@@ -1,1 +1,2 @@
-# auth
+# mozip-auth
+auth
