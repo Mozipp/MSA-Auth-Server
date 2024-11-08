@@ -10,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-//@EnableWebFluxSecurity  // WebFlux를 사용하는 경우
 @EnableWebSecurity  // Spring MVC를 사용하는 경우
 public class SecurityConfig {
 
