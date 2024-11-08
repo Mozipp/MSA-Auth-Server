@@ -1,23 +1,28 @@
-// SecurityConfig.java
 package com.example.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
+// 또는 @EnableWebSecurity (Spring MVC 사용 시)
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebFluxSecurity
+@EnableWebFluxSecurity  // WebFlux를 사용하는 경우
+// @EnableWebSecurity  // Spring MVC를 사용하는 경우
 public class SecurityConfig {
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchange -> exchange.anyExchange().permitAll());
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/auth/login", "/auth/register", "/.well-known/jwks.json").permitAll()
+                        .anyRequest().authenticated()
+                );
         return http.build();
     }
 
