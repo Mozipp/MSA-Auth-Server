@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import java.time.Duration;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public class RedisConfig {
         RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration(
                 Arrays.asList(clusterNodes.split(","))
         );
-        clusterConfig.setMaxRedirects(maxRedirects); // maxRedirects 설정 추가
+        clusterConfig.setMaxRedirects(maxRedirects);
 
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(clusterConfig);
         lettuceConnectionFactory.setUseSsl(useSsl);
@@ -42,7 +42,7 @@ public class RedisConfig {
 
     @Bean
     @Primary
-    public ReactiveStringRedisTemplate reactiveRedisTemplate(LettuceConnectionFactory connectionFactory) {
-        return new ReactiveStringRedisTemplate(connectionFactory);
+    public StringRedisTemplate stringRedisTemplate(LettuceConnectionFactory connectionFactory) {
+        return new StringRedisTemplate(connectionFactory);
     }
 }

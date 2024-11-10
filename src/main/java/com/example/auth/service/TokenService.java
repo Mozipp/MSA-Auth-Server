@@ -2,34 +2,30 @@
 package com.example.auth.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 
 @RequiredArgsConstructor
 @Service
 public class TokenService {
 
-    private final ReactiveStringRedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     private static final String REFRESH_TOKEN_KEY = "refresh_token:%s";
 
-    public Mono<Void> storeRefreshToken(String sessionId, String refreshToken, long expiration) {
+    public void storeRefreshToken(String sessionId, String refreshToken, long expiration) {
         String key = String.format(REFRESH_TOKEN_KEY, sessionId);
-        return redisTemplate.opsForValue()
-                .set(key, refreshToken, Duration.ofMillis(expiration))
-                .then();
+        redisTemplate.opsForValue().set(key, refreshToken, Duration.ofMillis(expiration));
     }
 
-    public Mono<String> getRefreshToken(String sessionId) {
+    public String getRefreshToken(String sessionId) {
         String key = String.format(REFRESH_TOKEN_KEY, sessionId);
         return redisTemplate.opsForValue().get(key);
     }
 
-    public Mono<Void> deleteRefreshToken(String sessionId) {
+    public void deleteRefreshToken(String sessionId) {
         String key = String.format(REFRESH_TOKEN_KEY, sessionId);
-        return redisTemplate.delete(key).then();
+        redisTemplate.delete(key);
     }
 }

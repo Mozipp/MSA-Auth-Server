@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -23,68 +22,63 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final CookieUtil cookieUtil;
 
-    public Mono<Void> login(LoginRequest loginRequest, HttpServletResponse response) {
-        return userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword())
-                .switchIfEmpty(Mono.error(new RuntimeException("인증 실패")))
-                .flatMap(user -> generateTokensAndSetCookies(user, response));
+    public void login(LoginRequest loginRequest, HttpServletResponse response) {
+        User user = userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword())
+                .orElseThrow(() -> new RuntimeException("인증 실패"));
+        generateTokensAndSetCookies(user, response);
     }
 
-    public Mono<Void> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+    public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
         String sessionId = cookieUtil.getCookieValue(request, "session_id");
         if (sessionId == null) {
-            return Mono.error(new RuntimeException("세션 ID 없음"));
+            throw new RuntimeException("세션 ID 없음");
         }
 
-        return tokenService.getRefreshToken(sessionId)
-                .switchIfEmpty(Mono.error(new RuntimeException("리프레시 토큰 없음")))
-                .flatMap(refreshToken -> {
-                    if (!jwtUtil.validateToken(refreshToken)) {
-                        return Mono.error(new RuntimeException("유효하지 않은 리프레시 토큰"));
-                    }
+        String refreshToken = tokenService.getRefreshToken(sessionId);
+        if (refreshToken == null) {
+            throw new RuntimeException("리프레시 토큰 없음");
+        }
 
-                    Claims claims = jwtUtil.getClaimsFromToken(refreshToken);
-                    String username = claims.getSubject();
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new RuntimeException("유효하지 않은 리프레시 토큰");
+        }
 
-                    return userService.findByUsername(username)
-                            .flatMap(user -> regenerateTokens(sessionId, user, response));
-                });
+        Claims claims = jwtUtil.getClaimsFromToken(refreshToken);
+        String username = claims.getSubject();
+
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        regenerateTokens(sessionId, user, response);
     }
 
-    public Mono<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
         String sessionId = cookieUtil.getCookieValue(request, "session_id");
-        if (sessionId == null) {
-            return Mono.empty();
+        if (sessionId != null) {
+            tokenService.deleteRefreshToken(sessionId);
+            cookieUtil.deleteCookie(response, "access_token");
+            cookieUtil.deleteCookie(response, "session_id");
         }
-
-        return tokenService.deleteRefreshToken(sessionId)
-                .then(Mono.fromRunnable(() -> {
-                    cookieUtil.deleteCookie(response, "access_token");
-                    cookieUtil.deleteCookie(response, "session_id");
-                }));
     }
 
-    private Mono<Void> generateTokensAndSetCookies(User user, HttpServletResponse response) {
+    private void generateTokensAndSetCookies(User user, HttpServletResponse response) {
         String accessToken = jwtUtil.generateAccessToken(user.getUsername());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
         String sessionId = UUID.randomUUID().toString();
 
-        return tokenService.storeRefreshToken(sessionId, refreshToken, jwtUtil.getRefreshTokenExpiration())
-                .then(Mono.fromRunnable(() -> {
-                    cookieUtil.addCookie(response, "access_token", accessToken, jwtUtil.getAccessTokenExpiration());
-                    cookieUtil.addCookie(response, "session_id", sessionId, jwtUtil.getRefreshTokenExpiration());
-                }));
+        tokenService.storeRefreshToken(sessionId, refreshToken, jwtUtil.getRefreshTokenExpiration());
+        cookieUtil.addCookie(response, "access_token", accessToken, jwtUtil.getAccessTokenExpiration());
+        cookieUtil.addCookie(response, "session_id", sessionId, jwtUtil.getRefreshTokenExpiration());
     }
 
-    private Mono<Void> regenerateTokens(String oldSessionId, User user, HttpServletResponse response) {
+    private void regenerateTokens(String oldSessionId, User user, HttpServletResponse response) {
         String newAccessToken = jwtUtil.generateAccessToken(user.getUsername());
         String newRefreshToken = jwtUtil.generateRefreshToken(user.getUsername());
         String newSessionId = UUID.randomUUID().toString();
 
-        return tokenService.storeRefreshToken(newSessionId, newRefreshToken, jwtUtil.getRefreshTokenExpiration())
-                .then(tokenService.deleteRefreshToken(oldSessionId))
-                .then(Mono.fromRunnable(() -> {
-                    cookieUtil.addCookie(response, "access_token", newAccessToken, jwtUtil.getAccessTokenExpiration());
-                    cookieUtil.addCookie(response, "session_id", newSessionId, jwtUtil.getRefreshTokenExpiration());
-                }));
+        tokenService.storeRefreshToken(newSessionId, newRefreshToken, jwtUtil.getRefreshTokenExpiration());
+        tokenService.deleteRefreshToken(oldSessionId);
+        cookieUtil.addCookie(response, "access_token", newAccessToken, jwtUtil.getAccessTokenExpiration());
+        cookieUtil.addCookie(response, "session_id", newSessionId, jwtUtil.getRefreshTokenExpiration());
     }
 }

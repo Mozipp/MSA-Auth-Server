@@ -2,11 +2,9 @@
 package com.example.auth.repository;
 
 import com.example.auth.entity.User;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
-@Repository
-public interface UserRepository extends ReactiveCrudRepository<User, String> {
-    Mono<User> findByUsername(String username);
+public interface UserRepository extends JpaRepository<User, String> {
+    Optional<User> findByUsername(String username);
 }
