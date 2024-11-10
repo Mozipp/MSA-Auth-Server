@@ -5,6 +5,7 @@ import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -44,10 +45,7 @@ public class JwtUtil {
     @PostConstruct
     public void init() throws Exception {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        try (InputStream keyStoreStream = getClass().getClassLoader().getResourceAsStream(keystorePath)) {
-            if (keyStoreStream == null) {
-                throw new IllegalArgumentException("키스토어 파일을 찾을 수 없습니다: " + keystorePath);
-            }
+        try (InputStream keyStoreStream = new ClassPathResource(keystorePath).getInputStream()) {
             keyStore.load(keyStoreStream, keystorePassword.toCharArray());
         }
         KeyStore.PasswordProtection keyPasswordProtection = new KeyStore.PasswordProtection(keyPassword.toCharArray());
