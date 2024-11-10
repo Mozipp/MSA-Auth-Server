@@ -18,7 +18,6 @@ public class CookieUtil {
         cookie.setPath("/");
         cookie.setMaxAge((int) (maxAge / 1000));
         cookie.setAttribute("SameSite", "Strict");
-        cookie.setDomain(".multi-learn.com");
         response.addCookie(cookie);
     }
 
@@ -29,7 +28,6 @@ public class CookieUtil {
         cookie.setPath("/");
         cookie.setMaxAge(0);
         cookie.setAttribute("SameSite", "Strict");
-        cookie.setDomain(".multi-learn.com");
         response.addCookie(cookie);
     }
 
