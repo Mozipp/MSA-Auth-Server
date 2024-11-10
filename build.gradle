@@ -52,6 +52,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'mysql:mysql-connector-java:8.0.32'
 
+	// Micrometer Tracing
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	implementation 'io.micrometer:micrometer-tracing'
+
 	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
