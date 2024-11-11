@@ -64,6 +64,7 @@ public class JwtUtil {
     public String generateAccessToken(String subject) {
         logger.info("Generating access token for subject: {}", subject);
         return Jwts.builder()
+                .setHeaderParam("kid", "rsa-key")
                 .setSubject(subject)
                 .setIssuer(issuer)
                 .setIssuedAt(new Date())
@@ -75,6 +76,7 @@ public class JwtUtil {
     public String generateRefreshToken(String subject) {
         logger.info("Generating refresh token for subject: {}", subject);
         return Jwts.builder()
+                .setHeaderParam("kid", "rsa-key")
                 .setSubject(subject)
                 .setIssuer(issuer)
                 .setIssuedAt(new Date())
