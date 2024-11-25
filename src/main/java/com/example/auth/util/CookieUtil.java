@@ -17,7 +17,6 @@ public class CookieUtil {
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge((int) (maxAge / 1000));
-        cookie.setAttribute("SameSite", "Strict");
         response.addCookie(cookie);
     }
 
