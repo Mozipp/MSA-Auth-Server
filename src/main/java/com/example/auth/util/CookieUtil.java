@@ -20,7 +20,7 @@ public class CookieUtil {
         cookie.setHttpOnly(true);
         cookie.setSecure(true); // HTTPS에서만 전송
         cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24); // 쿠키 유효 기간
+        cookie.setMaxAge((int)maxAge); // 쿠키 유효 기간
         cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
     }
