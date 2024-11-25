@@ -13,6 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000","https://api.multi-learn.com", "http://service-user-acitive.service.svc.cluster.local:8080", "http://service-auth-acitive.service.svc.cluster.local:8080", "http://service-products-acitive.service.svc.cluster.local:8080")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowCredentials(true)
+                .exposedHeaders("Set-Cookie");
     }
 }
