@@ -15,6 +15,8 @@ public class CookieUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(CookieUtil.class);
 
+    private static final String DOMAIN = ".multi-learn.com"; // 도메인 설정
+
     public void addCookie(HttpServletResponse response, String name, String value, long maxAge) {
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(true);
@@ -22,6 +24,7 @@ public class CookieUtil {
         cookie.setPath("/");
         cookie.setMaxAge((int)maxAge); // 쿠키 유효 기간
         cookie.setAttribute("SameSite", "None");
+        cookie.setDomain(DOMAIN); // 도메인 설정
         response.addCookie(cookie);
     }
 
@@ -32,6 +35,7 @@ public class CookieUtil {
         cookie.setPath("/");
         cookie.setMaxAge(0);
         cookie.setAttribute("SameSite", "None");
+        cookie.setDomain(DOMAIN); // 도메인 설정
         response.addCookie(cookie);
     }
 
