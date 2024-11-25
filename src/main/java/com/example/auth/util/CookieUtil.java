@@ -16,21 +16,12 @@ public class CookieUtil {
     private static final Logger logger = LoggerFactory.getLogger(CookieUtil.class);
 
     public void addCookie(HttpServletResponse response, String name, String value, long maxAge) {
-        logger.info("Adding cookie: {} with value: {} and maxAge: {}", name, value, maxAge);
-
-        StringBuilder cookieBuilder = new StringBuilder();
-        cookieBuilder.append(name).append("=").append(value).append("; ");
-        cookieBuilder.append("HttpOnly; ");
-        cookieBuilder.append("Path=/; ");
-        cookieBuilder.append("Max-Age=").append(60*60*24).append("; ");
-        cookieBuilder.append("SameSite=Lax; "); // 또는 "Strict"
-        // HTTPS를 사용하지 않으므로 Secure 플래그 제거
-        // if (isProduction) {
-        //     cookieBuilder.append("Secure; ");
-        // }
-
-        response.addHeader("Set-Cookie", cookieBuilder.toString());
-        logger.info("Set-Cookie header added: {}", cookieBuilder.toString());
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60*60*24);
+        response.addCookie(cookie);
     }
 
     public void deleteCookie(HttpServletResponse response, String name) {
