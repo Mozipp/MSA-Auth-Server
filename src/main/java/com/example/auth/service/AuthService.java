@@ -82,6 +82,7 @@ public class AuthService {
         cookieUtil.addCookie(response, "access_token", accessToken, jwtUtil.getAccessTokenExpiration());
         cookieUtil.addCookie(response, "session_id", sessionId, jwtUtil.getRefreshTokenExpiration());
 
+
         // 로그에 토큰 정보 출력 (보안 위험 주의)
         logger.info("User '{}' logged in. Access Token: {}, Refresh Token: {}, Session ID: {}",
                 user.getUsername(), accessToken, refreshToken, sessionId);
