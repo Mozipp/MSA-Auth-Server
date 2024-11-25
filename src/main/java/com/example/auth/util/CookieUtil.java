@@ -19,7 +19,7 @@ public class CookieUtil {
         logger.info("Set cookie");
         Cookie cookie = new Cookie(name, value);
         logger.info("Set HttpOnly");
-        cookie.setHttpOnly(true);
+//        cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
         logger.info("Set Path");
         cookie.setPath("/");
