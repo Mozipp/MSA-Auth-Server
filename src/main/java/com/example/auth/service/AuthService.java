@@ -79,9 +79,14 @@ public class AuthService {
         String sessionId = UUID.randomUUID().toString();
 
         tokenService.storeRefreshToken(sessionId, refreshToken, jwtUtil.getRefreshTokenExpiration());
-        cookieUtil.addCookie(response, "access_token", accessToken, jwtUtil.getAccessTokenExpiration());
-        cookieUtil.addCookie(response, "session_id", sessionId, jwtUtil.getRefreshTokenExpiration());
 
+        try {
+            cookieUtil.addCookie(response, "access_token", accessToken, jwtUtil.getAccessTokenExpiration());
+            cookieUtil.addCookie(response, "session_id", sessionId, jwtUtil.getRefreshTokenExpiration());
+        } catch (Exception e) {
+            logger.error("Failed to set cookies: {}", e.getMessage());
+            throw new RuntimeException("쿠키 설정 실패");
+        }
 
         // 로그에 토큰 정보 출력 (보안 위험 주의)
         logger.info("User '{}' logged in. Access Token: {}, Refresh Token: {}, Session ID: {}",

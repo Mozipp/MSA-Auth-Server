@@ -18,25 +18,43 @@ public class CookieUtil {
     private static final String DOMAIN = ".multi-learn.com"; // 도메인 설정
 
     public void addCookie(HttpServletResponse response, String name, String value, long maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge((int)maxAge); // 쿠키 유효 기간
-        cookie.setAttribute("SameSite", "None");
-        cookie.setDomain(DOMAIN); // 도메인 설정
-        response.addCookie(cookie);
+        try {
+            logger.debug("Adding cookie: name={}, value={}, maxAge={}", name, value, maxAge);
+            StringBuilder cookieBuilder = new StringBuilder();
+            cookieBuilder.append(name).append("=").append(value).append(";");
+            cookieBuilder.append("Path=/;");
+            cookieBuilder.append("Max-Age=").append(maxAge).append(";");
+            cookieBuilder.append("HttpOnly;");
+            cookieBuilder.append("Secure;");
+            cookieBuilder.append("SameSite=None;");
+            cookieBuilder.append("Domain=").append(DOMAIN).append(";");
+
+            response.addHeader("Set-Cookie", cookieBuilder.toString());
+            logger.debug("Cookie added successfully via Set-Cookie header: {}", cookieBuilder.toString());
+        } catch (Exception e) {
+            logger.error("Failed to add cookie: name={}, error={}", name, e.getMessage());
+            throw e; // 예외를 다시 던져 상위 메서드에서도 처리할 수 있게 함
+        }
     }
 
     public void deleteCookie(HttpServletResponse response, String name) {
-        Cookie cookie = new Cookie(name, null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        cookie.setAttribute("SameSite", "None");
-        cookie.setDomain(DOMAIN); // 도메인 설정
-        response.addCookie(cookie);
+        try {
+            logger.debug("Deleting cookie: name={}", name);
+            StringBuilder cookieBuilder = new StringBuilder();
+            cookieBuilder.append(name).append("=;"); // 값은 비웁니다
+            cookieBuilder.append("Path=/;");
+            cookieBuilder.append("Max-Age=0;");
+            cookieBuilder.append("HttpOnly;");
+            cookieBuilder.append("Secure;");
+            cookieBuilder.append("SameSite=None;");
+            cookieBuilder.append("Domain=").append(DOMAIN).append(";");
+
+            response.addHeader("Set-Cookie", cookieBuilder.toString());
+            logger.debug("Cookie deleted successfully via Set-Cookie header: {}", cookieBuilder.toString());
+        } catch (Exception e) {
+            logger.error("Failed to delete cookie: name={}, error={}", name, e.getMessage());
+            throw e;
+        }
     }
 
     public String getCookieValue(HttpServletRequest request, String name) {
