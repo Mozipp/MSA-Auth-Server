@@ -18,9 +18,10 @@ public class CookieUtil {
     public void addCookie(HttpServletResponse response, String name, String value, long maxAge) {
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
+        cookie.setSecure(true); // HTTPS에서만 전송
         cookie.setPath("/");
-        cookie.setMaxAge(60*60*24);
+        cookie.setMaxAge(60 * 60 * 24); // 쿠키 유효 기간
+        cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
     }
 
