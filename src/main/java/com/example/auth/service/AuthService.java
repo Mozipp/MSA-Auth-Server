@@ -79,7 +79,9 @@ public class AuthService {
         String sessionId = UUID.randomUUID().toString();
 
         tokenService.storeRefreshToken(sessionId, refreshToken, jwtUtil.getRefreshTokenExpiration());
+        logger.info("Add Token");
         cookieUtil.addCookie(response, "access_token", accessToken, jwtUtil.getAccessTokenExpiration());
+        logger.info("Add Session Id");
         cookieUtil.addCookie(response, "session_id", sessionId, jwtUtil.getRefreshTokenExpiration());
 
 
